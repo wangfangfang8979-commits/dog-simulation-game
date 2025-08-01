@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Life Simulator - Should You Get a Dog?</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="screen active">
+            <div class="welcome-content">
+                <div class="logo">
+                    <i class="fas fa-dog"></i>
+                    <h1>Dog Life Simulator</h1>
+                </div>
+                <p class="subtitle">Experience the reality of dog ownership before making the commitment</p>
+                <div class="stats-preview">
+                    <div class="stat-card">
+                        <i class="fas fa-heart"></i>
+                        <span>Lifestyle Impact</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Financial Cost</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <span>Time Commitment</span>
+                    </div>
+                </div>
+                <button id="start-game" class="btn-primary">Start Simulation</button>
+            </div>
+        </div>
+
+        <!-- Character Creation -->
+        <div id="character-creation" class="screen">
+            <div class="creation-content">
+                <h2>Create Your Character</h2>
+                <div class="character-form">
+                    <div class="form-group">
+                        <label for="player-name">Your Name:</label>
+                        <input type="text" id="player-name" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lifestyle">Current Lifestyle:</label>
+                        <select id="lifestyle">
+                            <option value="busy">Busy Professional (60+ hours/week)</option>
+                            <option value="moderate">Moderate Schedule (40 hours/week)</option>
+                            <option value="flexible">Flexible Schedule (Remote/Freelance)</option>
+                            <option value="student">Student</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="income">Monthly Income:</label>
+                        <select id="income">
+                            <option value="low">Under $3,000</option>
+                            <option value="medium">$3,000 - $6,000</option>
+                            <option value="high">$6,000 - $10,000</option>
+                            <option value="very-high">Over $10,000</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="living-situation">Living Situation:</label>
+                        <select id="living-situation">
+                            <option value="apartment">Apartment</option>
+                            <option value="house">House with Yard</option>
+                            <option value="condo">Condo</option>
+                            <option value="roommate">Roommate Situation</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="next-to-dog" class="btn-primary">Next: Choose Your Dog</button>
+            </div>
+        </div>
+
+        <!-- Dog Creation -->
+        <div id="dog-creation" class="screen">
+            <div class="creation-content">
+                <h2>Choose Your Dog</h2>
+                <div class="dog-form">
+                    <div class="form-group">
+                        <label for="dog-name">Your Dog's Name:</label>
+                        <input type="text" id="dog-name" placeholder="Enter your dog's name">
+                    </div>
+                    <div class="form-group">
+                        <label for="dog-breed">Dog Breed:</label>
+                        <select id="dog-breed">
+                            <option value="golden-retriever">Golden Retriever</option>
+                            <option value="labrador">Labrador Retriever</option>
+                            <option value="german-shepherd">German Shepherd</option>
+                            <option value="bulldog">Bulldog</option>
+                            <option value="beagle">Beagle</option>
+                            <option value="poodle">Poodle</option>
+                            <option value="rottweiler">Rottweiler</option>
+                            <option value="yorkshire-terrier">Yorkshire Terrier</option>
+                            <option value="boxer">Boxer</option>
+                            <option value="dachshund">Dachshund</option>
+                            <option value="siberian-husky">Siberian Husky</option>
+                            <option value="great-dane">Great Dane</option>
+                            <option value="chihuahua">Chihuahua</option>
+                            <option value="border-collie">Border Collie</option>
+                            <option value="mixed-breed">Mixed Breed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dog-age">Age (months):</label>
+                        <select id="dog-age">
+                            <option value="2">2 months (Puppy)</option>
+                            <option value="6">6 months (Young)</option>
+                            <option value="12">12 months (Adolescent)</option>
+                            <option value="24">24 months (Adult)</option>
+                            <option value="60">60 months (Senior)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dog-personality">Personality Traits:</label>
+                        <div class="personality-traits">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="energetic"> Energetic
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="calm"> Calm
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="playful"> Playful
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="shy"> Shy
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="protective"> Protective
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="friendly"> Friendly
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dog-preview">
+                        <div class="dog-avatar-large">
+                            <i class="fas fa-dog"></i>
+                        </div>
+                        <div class="dog-info">
+                            <h3 id="preview-name">Your Dog</h3>
+                            <p id="preview-breed">Choose a breed to see details</p>
+                            <p id="preview-age">Age: --</p>
+                            <p id="preview-personality">Personality: --</p>
+                        </div>
+                    </div>
+                </div>
+                <button id="create-character" class="btn-primary">Start Your Journey</button>
+            </div>
+        </div>
+
+        <!-- Main Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="player-info">
+                    <h3 id="player-display-name"></h3>
+                    <div class="stats">
+                        <div class="stat">
+                            <i class="fas fa-heart"></i>
+                            <span id="happiness">100</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span id="money">5000</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-clock"></i>
+                            <span id="time">100</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-calendar"></i>
+                            <span id="day">1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="dog-status">
+                    <div class="dog-avatar">
+                        <i class="fas fa-dog"></i>
+                    </div>
+                    <div class="dog-info-display">
+                        <h4 id="dog-display-name">Your Dog</h4>
+                        <p id="dog-display-breed">Breed</p>
+                    </div>
+                    <div class="dog-stats">
+                        <div class="dog-stat">
+                            <span>Energy: </span>
+                            <div class="progress-bar">
+                                <div id="energy-bar" class="progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="dog-stat">
+                            <span>Happiness: </span>
+                            <div class="progress-bar">
+                                <div id="happiness-bar" class="progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="dog-stat">
+                            <span>Health: </span>
+                            <div class="progress-bar">
+                                <div id="health-bar" class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-area">
+                    <div id="event-description" class="event-text">
+                        Welcome to your new life with a dog! Your puppy is excited to meet you.
+                    </div>
+                    <div id="choices" class="choices">
+                        <!-- Choices will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="action-panel">
+                    <h4>Daily Actions</h4>
+                    <div class="actions">
+                        <button class="action-btn" data-action="walk">
+                            <i class="fas fa-walking"></i>
+                            Walk Dog
+                        </button>
+                        <button class="action-btn" data-action="feed">
+                            <i class="fas fa-bone"></i>
+                            Feed Dog
+                        </button>
+                        <button class="action-btn" data-action="play">
+                            <i class="fas fa-toy"></i>
+                            Play
+                        </button>
+                        <button class="action-btn" data-action="train">
+                            <i class="fas fa-graduation-cap"></i>
+                            Train
+                        </button>
+                        <button class="action-btn" data-action="vet">
+                            <i class="fas fa-stethoscope"></i>
+                            Vet Visit
+                        </button>
+                        <button class="action-btn" data-action="groom">
+                            <i class="fas fa-cut"></i>
+                            Groom
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen">
+            <div class="results-content">
+                <h2>Simulation Complete!</h2>
+                <div class="results-summary">
+                    <div class="result-card">
+                        <h3>Your Experience</h3>
+                        <p id="experience-summary"></p>
+                    </div>
+                    <div class="result-card">
+                        <h3>Financial Impact</h3>
+                        <p id="financial-summary"></p>
+                    </div>
+                    <div class="result-card">
+                        <h3>Lifestyle Changes</h3>
+                        <p id="lifestyle-summary"></p>
+                    </div>
+                    <div class="result-card">
+                        <h3>Recommendation</h3>
+                        <p id="recommendation"></p>
+                    </div>
+                </div>
+                <div class="final-stats">
+                    <h3>Final Statistics</h3>
+                    <div class="final-stats-grid">
+                        <div class="final-stat">
+                            <span>Total Money Spent:</span>
+                            <span id="total-spent">$0</span>
+                        </div>
+                        <div class="final-stat">
+                            <span>Days Simulated:</span>
+                            <span id="total-days">0</span>
+                        </div>
+                        <div class="final-stat">
+                            <span>Dog Happiness:</span>
+                            <span id="final-happiness">0%</span>
+                        </div>
+                        <div class="final-stat">
+                            <span>Your Happiness:</span>
+                            <span id="final-player-happiness">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="dog-image-section">
+                    <h3>Your Dog's Portrait</h3>
+                    <p>Based on your care and decisions, here's how your dog turned out:</p>
+                    <div class="dog-image-container">
+                        <div id="dog-image-placeholder" class="dog-image-placeholder">
+                            <i class="fas fa-lock"></i>
+                            <p>Unlock your dog's portrait for $4.99</p>
+                        </div>
+                        <canvas id="dog-image-canvas" style="display: none;"></canvas>
+                    </div>
+                    <button id="purchase-image" class="btn-primary">Purchase Portrait ($4.99)</button>
+                </div>
+                <button id="restart-game" class="btn-primary">Start New Simulation</button>
+            </div>
+        </div>
+
+        <!-- Payment Modal -->
+        <div id="payment-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Purchase Your Dog's Portrait</h3>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="payment-info">
+                        <p>Get a beautiful portrait of your dog based on your simulation results!</p>
+                        <div class="price">$4.99</div>
+                    </div>
+                    <div class="payment-form">
+                        <div class="form-group">
+                            <label for="card-name">Cardholder Name:</label>
+                            <input type="text" id="card-name" placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="card-number">Card Number:</label>
+                            <input type="text" id="card-number" placeholder="1234 5678 9012 3456">
+                        </div>
+                        <div class="card-details">
+                            <div class="form-group">
+                                <label for="card-expiry">Expiry:</label>
+                                <input type="text" id="card-expiry" placeholder="MM/YY">
+                            </div>
+                            <div class="form-group">
+                                <label for="card-cvv">CVV:</label>
+                                <input type="text" id="card-cvv" placeholder="123">
+                            </div>
+                        </div>
+                    </div>
+                    <button id="process-payment" class="btn-primary">Process Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
