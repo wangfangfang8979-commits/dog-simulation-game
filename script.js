@@ -1,3 +1,5 @@
+console.log("JS is working");
+
 class DogSimulationGame {
     constructor() {
         // Initialize Supabase client
@@ -423,6 +425,11 @@ class DogSimulationGame {
         // Welcome screen
         document.getElementById('start-game').addEventListener('click', () => {
             this.showScreen('character-creation');
+        });
+
+        // Next to dog creation
+        document.getElementById('next-to-dog').addEventListener('click', () => {
+            this.showScreen('dog-creation');
         });
 
         // Character creation
