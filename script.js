@@ -421,6 +421,63 @@ class DogSimulationGame {
         return data;
     }
 
+    purchasePortrait() {
+        // Show payment modal
+        const modal = document.getElementById('payment-modal');
+        modal.style.display = 'block';
+    }
+
+    processPayment() {
+        // Get payment form data
+        const cardName = document.getElementById('card-name').value;
+        const cardNumber = document.getElementById('card-number').value;
+        const cardExpiry = document.getElementById('card-expiry').value;
+        const cardCvv = document.getElementById('card-cvv').value;
+
+        // Basic validation
+        if (!cardName || !cardNumber || !cardExpiry || !cardCvv) {
+            alert('Please fill in all payment fields.');
+            return;
+        }
+
+        // Simulate payment processing
+        alert('Payment processed successfully! Your dog portrait will be generated.');
+        
+        // Hide modal
+        document.getElementById('payment-modal').style.display = 'none';
+        
+        // Generate and display dog portrait
+        this.generateDogPortrait();
+    }
+
+    generateDogPortrait() {
+        // Hide placeholder and show canvas
+        document.getElementById('dog-image-placeholder').style.display = 'none';
+        const canvas = document.getElementById('dog-image-canvas');
+        canvas.style.display = 'block';
+        
+        // Generate a simple dog portrait based on game data
+        const ctx = canvas.getContext('2d');
+        canvas.width = 300;
+        canvas.height = 300;
+        
+        // Draw a simple dog portrait
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(100, 150, 100, 80); // Body
+        ctx.fillStyle = '#654321';
+        ctx.fillRect(110, 120, 80, 40); // Head
+        ctx.fillStyle = '#000';
+        ctx.fillRect(125, 135, 5, 5); // Left eye
+        ctx.fillRect(170, 135, 5, 5); // Right eye
+        ctx.fillStyle = '#FF6B6B';
+        ctx.fillRect(140, 150, 20, 10); // Nose
+        
+        // Add text
+        ctx.fillStyle = '#333';
+        ctx.font = '16px Arial';
+        ctx.fillText(`${this.gameState.player.name}'s Dog`, 80, 280);
+    }
+
     bindEvents() {
         // Welcome screen
         document.getElementById('start-game').addEventListener('click', () => {
@@ -448,6 +505,21 @@ class DogSimulationGame {
         // Restart game
         document.getElementById('restart-game').addEventListener('click', () => {
             this.restartGame();
+        });
+
+        // Purchase portrait
+        document.getElementById('purchase-image').addEventListener('click', () => {
+            this.purchasePortrait();
+        });
+
+        // Payment modal close button
+        document.querySelector('.close').addEventListener('click', () => {
+            document.getElementById('payment-modal').style.display = 'none';
+        });
+
+        // Process payment button
+        document.getElementById('process-payment').addEventListener('click', () => {
+            this.processPayment();
         });
     }
 
