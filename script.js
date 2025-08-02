@@ -450,32 +450,167 @@ class DogSimulationGame {
         this.generateDogPortrait();
     }
 
-    generateDogPortrait() {
-        // Hide placeholder and show canvas
-        document.getElementById('dog-image-placeholder').style.display = 'none';
-        const canvas = document.getElementById('dog-image-canvas');
-        canvas.style.display = 'block';
+    async generateDogPortrait() {
+        try {
+            // Hide placeholder and show loading
+            document.getElementById('dog-image-placeholder').style.display = 'none';
+            const canvas = document.getElementById('dog-image-canvas');
+            canvas.style.display = 'block';
+            
+            // Show loading message
+            const ctx = canvas.getContext('2d');
+            canvas.width = 400;
+            canvas.height = 400;
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(0, 0, 400, 400);
+            ctx.fillStyle = '#333';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Generating your dog portrait...', 200, 200);
+            
+            // Generate AI portrait using game data
+            const portraitUrl = await this.generateAIPortrait();
+            
+            if (portraitUrl) {
+                // Load and display the AI-generated image
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, 400, 400);
+                    ctx.drawImage(img, 0, 0, 400, 400);
+                    
+                    // Add player name
+                    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                    ctx.fillRect(0, 350, 400, 50);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`${this.gameState.player.name}'s Dog`, 200, 375);
+                };
+                img.src = portraitUrl;
+            } else {
+                // Fallback to simple drawing if AI fails
+                this.drawSimplePortrait(ctx);
+            }
+        } catch (error) {
+            console.error('Error generating portrait:', error);
+            this.drawSimplePortrait(ctx);
+        }
+    }
+
+    async generateAIPortrait() {
+        // This is a placeholder for AI image generation
+        // You can integrate with services like:
+        // - OpenAI DALL-E API
+        // - Stable Diffusion API
+        // - Midjourney API
+        // - Replicate API
         
-        // Generate a simple dog portrait based on game data
-        const ctx = canvas.getContext('2d');
-        canvas.width = 300;
-        canvas.height = 300;
+        const dogBreed = this.getDogBreedName();
+        const personality = this.getDogPersonality();
+        const happiness = this.gameState.dog.happiness;
         
-        // Draw a simple dog portrait
+        // Create a prompt for AI generation
+        const prompt = `A beautiful portrait of a ${dogBreed} dog, ${personality} personality, very happy and well-cared for, high quality, detailed, professional photography style`;
+        
+        // For now, return null to use fallback
+        // In a real implementation, you would call an AI API here
+        console.log('AI Portrait Prompt:', prompt);
+        
+        // Example API call (uncomment and configure with your API key):
+        /*
+        try {
+            const response = await fetch('https://api.openai.com/v1/images/generations', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer YOUR_API_KEY`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    prompt: prompt,
+                    n: 1,
+                    size: '512x512'
+                })
+            });
+            
+            const data = await response.json();
+            return data.data[0].url;
+        } catch (error) {
+            console.error('AI API error:', error);
+            return null;
+        }
+        */
+        
+        return null; // Use fallback for now
+    }
+
+    getDogBreedName() {
+        // Map breed values to actual breed names
+        const breedMap = {
+            'golden-retriever': 'Golden Retriever',
+            'labrador': 'Labrador Retriever',
+            'german-shepherd': 'German Shepherd',
+            'bulldog': 'Bulldog',
+            'beagle': 'Beagle',
+            'poodle': 'Poodle',
+            'rottweiler': 'Rottweiler',
+            'yorkshire-terrier': 'Yorkshire Terrier',
+            'boxer': 'Boxer',
+            'dachshund': 'Dachshund',
+            'siberian-husky': 'Siberian Husky',
+            'great-dane': 'Great Dane',
+            'chihuahua': 'Chihuahua',
+            'border-collie': 'Border Collie',
+            'mixed-breed': 'Mixed Breed'
+        };
+        
+        return breedMap[this.gameState.dog.breed] || 'Mixed Breed';
+    }
+
+    getDogPersonality() {
+        const happiness = this.gameState.dog.happiness;
+        if (happiness > 80) return 'joyful and energetic';
+        if (happiness > 60) return 'happy and content';
+        if (happiness > 40) return 'calm and relaxed';
+        return 'gentle and peaceful';
+    }
+
+    drawSimplePortrait(ctx) {
+        // Fallback simple drawing
+        ctx.clearRect(0, 0, 400, 400);
+        
+        // Draw a more detailed dog portrait
         ctx.fillStyle = '#8B4513';
-        ctx.fillRect(100, 150, 100, 80); // Body
-        ctx.fillStyle = '#654321';
-        ctx.fillRect(110, 120, 80, 40); // Head
-        ctx.fillStyle = '#000';
-        ctx.fillRect(125, 135, 5, 5); // Left eye
-        ctx.fillRect(170, 135, 5, 5); // Right eye
-        ctx.fillStyle = '#FF6B6B';
-        ctx.fillRect(140, 150, 20, 10); // Nose
+        ctx.fillRect(150, 200, 100, 80); // Body
         
-        // Add text
+        ctx.fillStyle = '#654321';
+        ctx.fillRect(160, 150, 80, 60); // Head
+        
+        // Ears
+        ctx.fillStyle = '#5D4037';
+        ctx.fillRect(165, 140, 15, 20);
+        ctx.fillRect(220, 140, 15, 20);
+        
+        // Eyes
+        ctx.fillStyle = '#000';
+        ctx.fillRect(175, 165, 8, 8);
+        ctx.fillRect(217, 165, 8, 8);
+        
+        // Nose
+        ctx.fillStyle = '#FF6B6B';
+        ctx.fillRect(195, 175, 10, 8);
+        
+        // Mouth
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(200, 190, 15, 0, Math.PI);
+        ctx.stroke();
+        
+        // Add player name
         ctx.fillStyle = '#333';
         ctx.font = '16px Arial';
-        ctx.fillText(`${this.gameState.player.name}'s Dog`, 80, 280);
+        ctx.textAlign = 'center';
+        ctx.fillText(`${this.gameState.player.name}'s Dog`, 200, 380);
     }
 
     bindEvents() {
@@ -520,6 +655,13 @@ class DogSimulationGame {
         // Process payment button
         document.getElementById('process-payment').addEventListener('click', () => {
             this.processPayment();
+        });
+
+        // Restart during game
+        document.getElementById('restart-during-game').addEventListener('click', () => {
+            if (confirm('Are you sure you want to restart the game? All progress will be lost.')) {
+                this.restartGame();
+            }
         });
     }
 
@@ -762,56 +904,14 @@ class DogSimulationGame {
         const player = this.gameState.player;
         const dog = this.gameState.dog;
 
-        // Experience summary
-        let experienceText = '';
-        if (dog.happiness > 80) {
-            experienceText = 'You had a wonderful experience with your dog!';
-        } else if (dog.happiness > 60) {
-            experienceText = 'You had a good experience with your dog.';
-        } else if (dog.happiness > 40) {
-            experienceText = 'You had a challenging but manageable experience.';
-        } else {
-            experienceText = 'You found dog ownership quite difficult.';
-        }
-
-        // Financial summary
-        let financialText = '';
-        if (stats.totalSpent < 1000) {
-            financialText = 'Dog ownership was relatively affordable for you.';
-        } else if (stats.totalSpent < 3000) {
-            financialText = 'Dog ownership had moderate financial impact.';
-        } else {
-            financialText = 'Dog ownership was quite expensive.';
-        }
-
-        // Lifestyle summary
-        let lifestyleText = '';
-        if (player.happiness > 80) {
-            lifestyleText = 'Dog ownership enhanced your lifestyle significantly.';
-        } else if (player.happiness > 60) {
-            lifestyleText = 'Dog ownership had a positive impact on your lifestyle.';
-        } else if (player.happiness > 40) {
-            lifestyleText = 'Dog ownership required significant lifestyle adjustments.';
-        } else {
-            lifestyleText = 'Dog ownership was very challenging for your lifestyle.';
-        }
-
-        // Recommendation
-        let recommendation = '';
-        const score = (dog.happiness + player.happiness) / 2;
-        if (score > 80) {
-            recommendation = 'YES - You would likely enjoy dog ownership!';
-        } else if (score > 60) {
-            recommendation = 'MAYBE - Consider your circumstances carefully.';
-        } else {
-            recommendation = 'NO - Dog ownership may not be right for you right now.';
-        }
+        // Generate detailed report
+        const report = this.generateDetailedReport(stats, player, dog);
 
         // Update results
-        document.getElementById('experience-summary').textContent = experienceText;
-        document.getElementById('financial-summary').textContent = financialText;
-        document.getElementById('lifestyle-summary').textContent = lifestyleText;
-        document.getElementById('recommendation').textContent = recommendation;
+        document.getElementById('experience-summary').textContent = report.experienceText;
+        document.getElementById('financial-summary').textContent = report.financialText;
+        document.getElementById('lifestyle-summary').textContent = report.lifestyleText;
+        document.getElementById('recommendation').textContent = report.recommendation;
 
         // Final statistics
         document.getElementById('total-spent').textContent = `$${stats.totalSpent}`;
@@ -821,6 +921,156 @@ class DogSimulationGame {
 
         // Load and display leaderboard
         await this.displayLeaderboard();
+    }
+
+    generateDetailedReport(stats, player, dog) {
+        // Determine dog raising style
+        const style = this.analyzeDogRaisingStyle(stats, player, dog);
+        
+        // Financial analysis
+        const financialAnalysis = this.analyzeFinancialBurden(stats, player);
+        
+        // Lifestyle impact
+        const lifestyleAnalysis = this.analyzeLifestyleImpact(stats, player, dog);
+        
+        // Final recommendation
+        const score = (dog.happiness + player.happiness) / 2;
+        const recommendation = this.generateRecommendation(score, financialAnalysis, lifestyleAnalysis);
+
+        return {
+            experienceText: style.description,
+            financialText: financialAnalysis.summary,
+            lifestyleText: lifestyleAnalysis.summary,
+            recommendation: recommendation.text,
+            style: style,
+            financial: financialAnalysis,
+            lifestyle: lifestyleAnalysis,
+            recommendation: recommendation
+        };
+    }
+
+    analyzeDogRaisingStyle(stats, player, dog) {
+        const walkRatio = stats.walks / Math.max(player.day, 1);
+        const trainingRatio = stats.trainingSessions / Math.max(player.day, 1);
+        const groomingRatio = stats.groomingSessions / Math.max(player.day, 1);
+        const accidentRatio = stats.accidents / Math.max(player.day, 1);
+
+        if (walkRatio > 0.8 && trainingRatio > 0.6 && groomingRatio > 0.4) {
+            return {
+                name: "The Dedicated Caregiver",
+                description: "You showed exceptional commitment to your dog's well-being with regular walks, consistent training, and proper grooming. Your dog thrived under your care!",
+                characteristics: ["High activity level", "Consistent training", "Regular grooming", "Strong bond"]
+            };
+        } else if (walkRatio > 0.5 && trainingRatio > 0.3) {
+            return {
+                name: "The Balanced Owner",
+                description: "You maintained a good balance between care and lifestyle. Your dog was happy and well-adjusted under your care.",
+                characteristics: ["Moderate activity", "Some training", "Basic care", "Good relationship"]
+            };
+        } else if (accidentRatio > 0.3) {
+            return {
+                name: "The Struggling Newcomer",
+                description: "You faced challenges with dog ownership, particularly with training and housebreaking. More preparation and patience would help.",
+                characteristics: ["Learning curve", "Training difficulties", "Time management", "Need for guidance"]
+            };
+        } else {
+            return {
+                name: "The Casual Companion",
+                description: "You provided basic care but could have been more engaged. Your dog was content but could have benefited from more attention.",
+                characteristics: ["Basic care", "Limited training", "Minimal grooming", "Room for improvement"]
+            };
+        }
+    }
+
+    analyzeFinancialBurden(stats, player) {
+        const monthlyCost = stats.totalSpent / (player.day / 30);
+        const incomeLevel = player.income;
+        
+        let burdenLevel, summary, upsides, downsides;
+        
+        if (monthlyCost < 200) {
+            burdenLevel = "Low";
+            summary = "Dog ownership was very affordable for your income level.";
+            upsides = ["Minimal financial stress", "Easy to budget", "Room for extras"];
+            downsides = ["May have cut corners on care", "Limited premium services"];
+        } else if (monthlyCost < 500) {
+            burdenLevel = "Moderate";
+            summary = "Dog ownership had manageable financial impact.";
+            upsides = ["Good care standards", "Balanced spending", "Sustainable long-term"];
+            downsides = ["Requires budgeting", "Some lifestyle adjustments"];
+        } else {
+            burdenLevel = "High";
+            summary = "Dog ownership was quite expensive and may strain your budget.";
+            upsides = ["Premium care", "Best services", "Comprehensive coverage"];
+            downsides = ["Significant financial impact", "May affect other expenses", "Requires careful planning"];
+        }
+
+        return {
+            monthlyCost: monthlyCost,
+            burdenLevel: burdenLevel,
+            summary: summary,
+            upsides: upsides,
+            downsides: downsides
+        };
+    }
+
+    analyzeLifestyleImpact(stats, player, dog) {
+        const timeCommitment = (stats.walks * 30 + stats.trainingSessions * 45 + stats.groomingSessions * 60) / player.day;
+        const socialImpact = stats.socialEvents;
+        const stressLevel = player.happiness < 50 ? "High" : player.happiness < 70 ? "Moderate" : "Low";
+        
+        let impact, summary, upsides, downsides;
+        
+        if (timeCommitment > 2 && player.happiness > 70) {
+            impact = "Positive";
+            summary = "Dog ownership greatly enhanced your lifestyle and happiness.";
+            upsides = ["Increased physical activity", "Better mental health", "Social opportunities", "Unconditional love"];
+            downsides = ["Time commitment", "Travel restrictions", "Daily responsibilities"];
+        } else if (timeCommitment > 1 && player.happiness > 50) {
+            impact = "Neutral";
+            summary = "Dog ownership had mixed effects on your lifestyle.";
+            upsides = ["Some companionship", "Basic routine", "Moderate activity"];
+            downsides = ["Time constraints", "Some stress", "Lifestyle changes"];
+        } else {
+            impact = "Negative";
+            summary = "Dog ownership was challenging for your current lifestyle.";
+            upsides = ["Learning experience", "Responsibility growth"];
+            downsides = ["High stress", "Time conflicts", "Lifestyle disruption"];
+        }
+
+        return {
+            timeCommitment: timeCommitment,
+            socialImpact: socialImpact,
+            stressLevel: stressLevel,
+            impact: impact,
+            summary: summary,
+            upsides: upsides,
+            downsides: downsides
+        };
+    }
+
+    generateRecommendation(score, financial, lifestyle) {
+        const overallScore = (score + (financial.burdenLevel === "Low" ? 80 : financial.burdenLevel === "Moderate" ? 60 : 40) + (lifestyle.impact === "Positive" ? 80 : lifestyle.impact === "Neutral" ? 60 : 40)) / 3;
+        
+        if (overallScore > 75) {
+            return {
+                text: "YES - You would likely thrive as a dog owner!",
+                confidence: "High",
+                reasoning: "Your lifestyle, financial situation, and care style suggest you're well-suited for dog ownership."
+            };
+        } else if (overallScore > 60) {
+            return {
+                text: "MAYBE - Consider your circumstances carefully.",
+                confidence: "Medium",
+                reasoning: "You have potential but should prepare more thoroughly before getting a dog."
+            };
+        } else {
+            return {
+                text: "NO - Dog ownership may not be right for you right now.",
+                confidence: "High",
+                reasoning: "Your current situation suggests dog ownership would be challenging."
+            };
+        }
     }
 
     async displayLeaderboard() {
