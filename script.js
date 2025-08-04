@@ -248,6 +248,28 @@ class DogSimulationGame {
         this.bindEvents();
         this.showScreen('welcome-screen');
         this.checkForSavedGame();
+        this.setupDogImages();
+    }
+
+    setupDogImages() {
+        // Dog breed images mapping
+        this.dogImages = {
+            'golden-retriever': 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=200&h=200&fit=crop',
+            'labrador': 'https://images.unsplash.com/photo-1546527868-ccb7ee7dfa6a?w=200&h=200&fit=crop',
+            'german-shepherd': 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e87?w=200&h=200&fit=crop',
+            'bulldog': 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=200&h=200&fit=crop',
+            'beagle': 'https://images.unsplash.com/photo-1507146426996-ef05306b0a78?w=200&h=200&fit=crop',
+            'poodle': 'https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?w=200&h=200&fit=crop',
+            'rottweiler': 'https://images.unsplash.com/photo-1567752881298-894bb81f9379?w=200&h=200&fit=crop',
+            'yorkshire-terrier': 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=200&h=200&fit=crop',
+            'boxer': 'https://images.unsplash.com/photo-1547407139-3c921a66005c?w=200&h=200&fit=crop',
+            'dachshund': 'https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?w=200&h=200&fit=crop',
+            'siberian-husky': 'https://images.unsplash.com/photo-1547407139-3c921a66005c?w=200&h=200&fit=crop',
+            'great-dane': 'https://images.unsplash.com/photo-1547407139-3c921a66005c?w=200&h=200&fit=crop',
+            'chihuahua': 'https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?w=200&h=200&fit=crop',
+            'border-collie': 'https://images.unsplash.com/photo-1507146426996-ef05306b0a78?w=200&h=200&fit=crop',
+            'mixed-breed': 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=200&h=200&fit=crop'
+        };
     }
 
     // Supabase methods
@@ -624,6 +646,11 @@ class DogSimulationGame {
             this.showScreen('dog-creation');
         });
 
+        // Dog breed selection
+        document.getElementById('dog-breed').addEventListener('change', (e) => {
+            this.updateDogPreview(e.target.value);
+        });
+
         // Character creation
         document.getElementById('create-character').addEventListener('click', async () => {
             await this.createCharacter();
@@ -694,6 +721,20 @@ class DogSimulationGame {
         this.gameState.player.lifestyle = lifestyle;
         this.gameState.player.income = income;
         this.gameState.player.livingSituation = livingSituation;
+
+        // Get dog information
+        const dogName = document.getElementById('dog-name').value.trim() || 'Buddy';
+        const dogBreed = document.getElementById('dog-breed').value;
+        const dogAge = parseInt(document.getElementById('dog-age').value);
+
+        this.gameState.dog.name = dogName;
+        this.gameState.dog.breed = dogBreed;
+        this.gameState.dog.age = dogAge;
+
+        // Update dog display
+        document.getElementById('dog-display-name').textContent = dogName;
+        document.getElementById('dog-display-breed').textContent = this.getDogBreedName();
+        this.updateDogPreview(dogBreed);
 
         // Adjust starting stats based on lifestyle
         this.adjustStartingStats();
@@ -767,6 +808,7 @@ class DogSimulationGame {
         this.gameState.currentEvent = randomEvent;
         this.gameState.events.push(randomEvent.id);
 
+        this.updateProgressTracker();
         this.displayEvent(randomEvent);
     }
 
@@ -911,7 +953,11 @@ class DogSimulationGame {
         document.getElementById('experience-summary').textContent = report.experienceText;
         document.getElementById('financial-summary').textContent = report.financialText;
         document.getElementById('lifestyle-summary').textContent = report.lifestyleText;
-        document.getElementById('recommendation').textContent = report.recommendation;
+        document.getElementById('recommendation').textContent = report.recommendation.text;
+
+        // Update recommendation score
+        document.getElementById('recommendation-score').textContent = report.recommendation.score;
+        document.getElementById('recommendation-summary').textContent = report.recommendation.summary;
 
         // Final statistics
         document.getElementById('total-spent').textContent = `$${stats.totalSpent}`;
@@ -1049,28 +1095,81 @@ class DogSimulationGame {
         };
     }
 
+    updateDogPreview(breed) {
+        const imageElement = document.getElementById('dog-breed-image');
+        const gameImageElement = document.getElementById('dog-game-image');
+        const breedNameElement = document.getElementById('preview-breed');
+        
+        if (this.dogImages[breed]) {
+            imageElement.src = this.dogImages[breed];
+            gameImageElement.src = this.dogImages[breed];
+        }
+        
+        // Update breed name
+        const breedNames = {
+            'golden-retriever': 'Golden Retriever',
+            'labrador': 'Labrador Retriever',
+            'german-shepherd': 'German Shepherd',
+            'bulldog': 'Bulldog',
+            'beagle': 'Beagle',
+            'poodle': 'Poodle',
+            'rottweiler': 'Rottweiler',
+            'yorkshire-terrier': 'Yorkshire Terrier',
+            'boxer': 'Boxer',
+            'dachshund': 'Dachshund',
+            'siberian-husky': 'Siberian Husky',
+            'great-dane': 'Great Dane',
+            'chihuahua': 'Chihuahua',
+            'border-collie': 'Border Collie',
+            'mixed-breed': 'Mixed Breed'
+        };
+        
+        breedNameElement.textContent = breedNames[breed] || 'Mixed Breed';
+    }
+
+    updateProgressTracker() {
+        const currentQuestion = this.gameState.events.length + 1;
+        const totalQuestions = this.events.length;
+        
+        document.getElementById('current-question').textContent = `Question ${currentQuestion}`;
+        document.getElementById('total-questions').textContent = `/ ${totalQuestions}`;
+        
+        const progressPercentage = (currentQuestion / totalQuestions) * 100;
+        document.getElementById('question-progress').style.width = `${progressPercentage}%`;
+    }
+
     generateRecommendation(score, financial, lifestyle) {
         const overallScore = (score + (financial.burdenLevel === "Low" ? 80 : financial.burdenLevel === "Moderate" ? 60 : 40) + (lifestyle.impact === "Positive" ? 80 : lifestyle.impact === "Neutral" ? 60 : 40)) / 3;
         
+        // Calculate recommendation score (1-10)
+        const recommendationScore = Math.round((overallScore / 100) * 10);
+        
+        let text, confidence, reasoning, summary;
+        
         if (overallScore > 75) {
-            return {
-                text: "YES - You would likely thrive as a dog owner!",
-                confidence: "High",
-                reasoning: "Your lifestyle, financial situation, and care style suggest you're well-suited for dog ownership."
-            };
+            text = "YES - You would likely thrive as a dog owner!";
+            confidence = "High";
+            reasoning = "Your lifestyle, financial situation, and care style suggest you're well-suited for dog ownership.";
+            summary = `Based on your simulation results, you scored ${recommendationScore}/10. You should definitely consider getting a dog! Your lifestyle and financial situation are well-suited for dog ownership.`;
         } else if (overallScore > 60) {
-            return {
-                text: "MAYBE - Consider your circumstances carefully.",
-                confidence: "Medium",
-                reasoning: "You have potential but should prepare more thoroughly before getting a dog."
-            };
+            text = "MAYBE - Consider your circumstances carefully.";
+            confidence = "Medium";
+            reasoning = "You have potential but should prepare more thoroughly before getting a dog.";
+            summary = `Based on your simulation results, you scored ${recommendationScore}/10. You might be ready for a dog, but consider preparing more thoroughly first.`;
         } else {
-            return {
-                text: "NO - Dog ownership may not be right for you right now.",
-                confidence: "High",
-                reasoning: "Your current situation suggests dog ownership would be challenging."
-            };
+            text = "NO - Dog ownership may not be right for you right now.";
+            confidence = "High";
+            reasoning = "Your current situation suggests dog ownership would be challenging.";
+            summary = `Based on your simulation results, you scored ${recommendationScore}/10. You should wait before getting a dog. Focus on improving your situation first.`;
         }
+        
+        return {
+            text: text,
+            confidence: confidence,
+            reasoning: reasoning,
+            summary: summary,
+            score: recommendationScore
+        };
     }
 
     async displayLeaderboard() {
