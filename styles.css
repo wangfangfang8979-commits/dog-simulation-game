@@ -411,6 +411,42 @@ body {
     color: rgba(255, 255, 255, 0.9);
 }
 
+/* Stripe Payment Styles */
+.stripe-card-element {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    margin-bottom: 15px;
+}
+
+.payment-error {
+    color: #dc3545;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    display: none;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+#process-payment {
+    position: relative;
+    min-height: 44px;
+}
+
+#process-payment:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .event-text {
     font-size: 1.1rem;
     line-height: 1.6;

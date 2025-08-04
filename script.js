@@ -7,6 +7,11 @@ class DogSimulationGame {
         this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImloYWVxZ3N6bmR2d2p3YXJwZHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxMDIxMTIsImV4cCI6MjA2OTY3ODExMn0.w2N9Pk5fDQAjHlbMWz-t057wl5YTaX_TDVbpyXshgdY';
         this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
         
+        // Initialize Stripe
+        this.stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY'); // Replace with your Stripe publishable key
+        this.elements = null;
+        this.card = null;
+        
         this.gameState = {
             player: {
                 name: '',
@@ -447,29 +452,116 @@ class DogSimulationGame {
         // Show payment modal
         const modal = document.getElementById('payment-modal');
         modal.style.display = 'block';
+        
+        // Initialize Stripe Elements if not already done
+        if (!this.elements) {
+            this.elements = this.stripe.elements();
+            this.card = this.elements.create('card', {
+                style: {
+                    base: {
+                        fontSize: '16px',
+                        color: '#424770',
+                        '::placeholder': {
+                            color: '#aab7c4',
+                        },
+                    },
+                    invalid: {
+                        color: '#9e2146',
+                    },
+                },
+            });
+            this.card.mount('#card-element');
+            
+            // Handle real-time validation errors
+            this.card.addEventListener('change', (event) => {
+                const displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                    displayError.style.display = 'block';
+                } else {
+                    displayError.textContent = '';
+                    displayError.style.display = 'none';
+                }
+            });
+        }
     }
 
-    processPayment() {
-        // Get payment form data
+    async processPayment() {
         const cardName = document.getElementById('card-name').value;
-        const cardNumber = document.getElementById('card-number').value;
-        const cardExpiry = document.getElementById('card-expiry').value;
-        const cardCvv = document.getElementById('card-cvv').value;
-
-        // Basic validation
-        if (!cardName || !cardNumber || !cardExpiry || !cardCvv) {
-            alert('Please fill in all payment fields.');
+        
+        if (!cardName) {
+            alert('Please enter your name.');
             return;
         }
 
-        // Simulate payment processing
-        alert('Payment processed successfully! Your dog portrait will be generated.');
+        // Disable the button and show spinner
+        const button = document.getElementById('process-payment');
+        const buttonText = document.getElementById('payment-button-text');
+        const spinner = document.getElementById('payment-spinner');
         
-        // Hide modal
-        document.getElementById('payment-modal').style.display = 'none';
-        
-        // Generate and display dog portrait
-        this.generateDogPortrait();
+        button.disabled = true;
+        buttonText.textContent = 'Processing...';
+        spinner.style.display = 'inline-block';
+
+        try {
+            // Create payment method
+            const { paymentMethod, error } = await this.stripe.createPaymentMethod({
+                type: 'card',
+                card: this.card,
+                billing_details: {
+                    name: cardName,
+                },
+            });
+
+            if (error) {
+                throw new Error(error.message);
+            }
+
+            // Send payment to your server (you'll need a backend)
+            const response = await fetch('/api/create-payment-intent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    payment_method_id: paymentMethod.id,
+                    amount: 499, // $4.99 in cents
+                    currency: 'usd',
+                    description: 'Dog Portrait - ' + this.gameState.player.name,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.error) {
+                throw new Error(result.error);
+            }
+
+            // Confirm the payment
+            const { error: confirmError } = await this.stripe.confirmCardPayment(result.client_secret);
+
+            if (confirmError) {
+                throw new Error(confirmError.message);
+            }
+
+            // Payment successful
+            alert('Payment successful! Your dog portrait will be generated.');
+            
+            // Hide modal
+            document.getElementById('payment-modal').style.display = 'none';
+            
+            // Generate and display dog portrait
+            this.generateDogPortrait();
+
+        } catch (error) {
+            console.error('Payment error:', error);
+            alert('Payment failed: ' + error.message);
+        } finally {
+            // Re-enable the button
+            button.disabled = false;
+            buttonText.textContent = 'Pay $4.99';
+            spinner.style.display = 'none';
+        }
     }
 
     async generateDogPortrait() {
